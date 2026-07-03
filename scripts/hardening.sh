@@ -18,29 +18,31 @@ fi
 # Conceder privilegios sudo restringidos a los miembros del grupo
 echo "%sysadmins ALL=(ALL:ALL) ALL" > /etc/sudoers.d/sysadmins
 
-# 2. FIREWALL PERIMETRAL (Iptables en Capa de Red Interna)
-echo "[+] Aplicando políticas estrictas de Firewall (Zero-Trust)..."
+# 2. FIREWALL PERIMETRAL (Nftables Nativo)
+echo "[+] Aplicando políticas estrictas de Firewall con Nftables (Zero-Trust)..."
 
-# Limpiar tablas previas para evitar conflictos de red
-iptables -F
-iptables -X
+# Limpiar cualquier regla previa en el kernel
+nft flush ruleset
 
-# Establecer políticas por defecto: Bloquear entrada y reenvío, permitir salida
-iptables -P INPUT DROP
-iptables -P FORWARD DROP
-iptables -P OUTPUT ACCEPT
+# Crear la tabla base 'filter' para tráfico unificado (IPv4/IPv6)
+nft add table inet filter
 
-# Mantener vivas conexiones establecidas y relacionadas
-iptables -A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+# Configurar cadenas y establecer política DROP por defecto (Bloquear Entrada y Reenvío)
+nft add chain inet filter input { type filter hook input priority 0 \; policy drop \; }
+nft add chain inet filter forward { type filter hook forward priority 0 \; policy drop \; }
+nft add chain inet filter output { type filter hook output priority 0 \; policy accept \; }
 
 # Permitir tráfico local en la interfaz de loopback
-iptables -A INPUT -i lo -j ACCEPT
+nft add rule inet filter input iif lo accept
+
+# Mantener vivas conexiones establecidas y relacionadas
+nft add rule inet filter input ct state established,related accept
 
 # ABRIR ÚNICAMENTE EL PUERTO SSH SEGURO (2222)
-iptables -A INPUT -p tcp --dport 2222 -j ACCEPT
+nft add rule inet filter input tcp dport 2222 accept
 
-echo "[✔] Firewall configurado. Matriz de reglas activas:"
-iptables -L -v -n
+echo "[✔] Firewall Nftables configurado. Matriz de reglas activas:"
+nft list ruleset
 
 # 3. ENDURECIMIENTO DE POLÍTICAS SSH
 echo "[+] Escribiendo directivas de seguridad en sshd_config..."
