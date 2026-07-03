@@ -99,6 +99,8 @@ sudo docker compose up -d --build
 ```bash
 ssh operador@localhost -p 2222
 ```
+<img width="712" height="506" alt="Captura de pantalla_20260703_100155" src="https://github.com/user-attachments/assets/a78fc79c-7595-471d-b120-c444b702b62b" />
+
 
 - Contraseña: PasswordSeguro123
 
@@ -134,6 +136,8 @@ Resultado esperado (Aislamiento verificado):
 PORT     STATE SERVICE
 2222/tcp open  EtherNet/IP-1
 ```
+<img width="678" height="463" alt="Captura de pantalla_20260703_100102" src="https://github.com/user-attachments/assets/844617e2-7a41-4e49-bae8-7216b20fc989" />
+
 
 ## 🔍 Auditoría y Pruebas de Concepto (PoC)
 
