@@ -4,12 +4,13 @@ services:
   secure_server:
     build: .
     container_name: azure4_secure_server
-    privileged: true # Esencial para aplicar las reglas de Iptables internamente
+    privileged: true # Esencial para permitir que nftables manipule la pila de red del contenedor
     ports:
-      - "2222:2222"  # Mapea el puerto seguro de tu máquina local al contenedor
+      - "2222:2222"  # Mapea el puerto seguro SSH de la máquina host al contenedor
+    restart: always  # Asegura que el contenedor se levante automáticamente si falla
     networks:
       - red_cloud_segura
 
 networks:
   red_cloud_segura:
-    driver: bridge
+    driver: bridge   # Red aislada interna para simular un entorno de infraestructura seguro
