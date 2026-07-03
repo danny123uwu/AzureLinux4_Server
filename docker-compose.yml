@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  secure_server:
+    build: .
+    container_name: azure4_secure_server
+    privileged: true # Esencial para aplicar las reglas de Iptables internamente
+    ports:
+      - "2222:2222"  # Mapea el puerto seguro de tu máquina local al contenedor
+    networks:
+      - red_cloud_segura
+
+networks:
+  red_cloud_segura:
+    driver: bridge
